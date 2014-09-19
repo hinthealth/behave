@@ -1,0 +1,20 @@
+{
+  "name": "behave",
+  "version": "0.0.0",
+  "description": "Front end testing helpers!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "js",
+    "testing",
+    "front-end"
+  ],
+  "author": "Blake West",
+  "license": "Private",
+  "devDependencies": {
+    "mocha": "^1.21.4",
+    "should": "^4.0.4"
+  }
+}

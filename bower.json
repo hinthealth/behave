@@ -1,0 +1,31 @@
+{
+  "name": "behave",
+  "version": "0.0.0",
+  "authors": [
+    "Blake West <bwest87@gmail.com>"
+  ],
+  "description": "Front end testing helpers!",
+  "main": "src/behave.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "testing",
+    "front-end",
+    "js",
+    "angular"
+  ],
+  "license": "Private",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jQuery": "~2.1.1",
+    "lodash": "~2.4.1"
+  }
+}
