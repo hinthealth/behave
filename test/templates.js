@@ -31,7 +31,7 @@
     "      <div class='form-group'>\n" +
     "        <label class='col-sm-4 control-label' for='forAttr'>Patient Terms of Service (url)</label>\n" +
     "        <div class='col-sm-8'>\n" +
-    "          <input class='form-control with-feedback' type='url' name='patient_terms_url' ng-model='params.patient_terms_url' placeholder='testPlaceholder'>\n" +
+    "          <input class='form-control with-feedback' type='url' name='forAttrTest' ng-model='params.patient_terms_url' placeholder='testPlaceholder'>\n" +
     "          <span class='help-block ng-hide slide-down' ng-show='form.patient_terms_url.$error.url'>URL must start with http:// or https://</span>\n" +
     "        </div>\n" +
     "      </div>\n" +

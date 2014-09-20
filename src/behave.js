@@ -3,15 +3,19 @@ window.Behave = {};
 Behave.view = $(document.body);
 Behave.domTypes = {
   field: {
-    elementTypes: ['input', 'select', 'option', 'label'],
+    elementTypes: ['input', 'select', 'option', 'label', 'textarea'],
     attrOptions: ['name', 'for', 'placeholder', 'contains']
   },
   clickable: {
     elementTypes: ['button', 'a'],
-    attrOptions: ['contains']
+    attrOptions: ['contains', 'href']
+  },
+  icon: {
+    elementTypes: ['icon', 'div', 'span'],
+    attrOptions: ['type']
   },
   display: {
-    elementTypes: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5'],
+    elementTypes: ['div', 'p', 'label', 'span', 'h1', 'h2', 'h3', 'h4', 'h5'],
     attrOptions: ['contains']
   }
 }
