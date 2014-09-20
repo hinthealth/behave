@@ -73,11 +73,27 @@
         // TODO: Create good list of display elements, or maybe just use body:contains ? figure this out.
       });
     });
-    xdescribe("with icon type elements", function() {
-      // TODO: Create tests for finding icons. Probably check classes and type.
+    describe("with icon type elements", function() {
+      beforeEach(function() {
+        $view.append("<span class='glyphicon glyphicon-cancel'></span>")
+        $view.append("<icon type='danger'></icon>")
+      });
+      it("find icons by type", function() {
+        Behave.find('danger', 'icon').attr('type').should.eql('danger');
+      });
+      it("find icons by class", function() {
+        Behave.find('cancel', 'icon').hasClass('glyphicon-cancel').should.be.true;
+      });
     });
-    xdescribe("when passing jQuery type selectors", function() {
-      // TODO: Implement me!
+    describe("when passing jQuery type selectors", function() {
+      beforeEach(function() {
+        $view.append("<div id='someId'>Worked!</div>")
+        $view.append("<div class='someclass'>Worked!</div>")
+      });
+      it("should use jQuery if it can't find it normally", function() {
+        Behave.find('#someId').text().should.eql('Worked!');
+        Behave.find('.someclass').text().should.eql('Worked!');
+      });
     });
   });
   describe("#fill", function() {
@@ -89,6 +105,8 @@
         var form = $("<form type='form'></form>")
         form.append("<input type='checkbox' name='accept_terms'>")
         form.append("<input type='text' name='first_name'>")
+        form.append("<label for='practice_url'>Practice Url</label>")
+        form.append("<input type='text' name='practice_url'>")
         $view.append(form)
       });
       describe('on individual form elements', function() {
@@ -103,15 +121,15 @@
         });
       });
       describe('on a whole form at once', function() {
-        it.only("should fill all the elements provided in the hash", function() {
+        it("should fill all the elements provided in the hash", function() {
           Behave.fill('form').with({
             accept_terms: true,
             first_name: 'Joe Shmo',
             'Practice Url': 'www.yesthisworked.com'
           });
-          // Behave.find('accept_terms').prop('checked').should.be.true
-          // Behave.find('first_name').prop('checked').should.eql('Joe Shmo')
-          // Behave.find('Practice Url').prop('checked').should.eql('www.yesthisworked.com')
+          Behave.find('accept_terms').prop('checked').should.be.true
+          Behave.find('first_name').val().should.eql('Joe Shmo')
+          Behave.find('Practice Url').val().should.eql('www.yesthisworked.com')
         })
       });
     })
