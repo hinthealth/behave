@@ -3,8 +3,8 @@ window.Behave = {};
 Behave.view = $(document.body);
 Behave.domTypes = {
   field: {
-    elementTypes: ['input', 'select', 'option', 'label', 'textarea'],
-    attrOptions: ['name', 'for', 'placeholder', 'contains']
+    elementTypes: ['input', 'select', 'option', 'label', 'textarea', 'form'],
+    attrOptions: ['name', 'for', 'placeholder', 'contains', 'type']
   },
   clickable: {
     elementTypes: ['button', 'a'],
@@ -25,15 +25,17 @@ var getClosestInput = function($el) {
   var relatedInput = sibling.find('input');
   return relatedInput.length > 0 ? relatedInput : $el;
 };
+
+var fillWithFunction =
+
 Behave.find = function(identifier, type) {
   type = type || 'field'
   var searchParams = this.domTypes[type];
   var element = {};
-
   _.each(searchParams.elementTypes, function(elType) {
     _.each(searchParams.attrOptions, function(attrOption) {
       // Changing filter syntax to handle jQuery "contains"
-      var filter = attrOption === 'contains' ? ":contains(" + identifier + ")" : "[" + attrOption + "=" + identifier + "]"
+      var filter = attrOption === 'contains' ? ":contains(" + identifier + ")" : "[" + attrOption + "='" + identifier + "']"
 
       // Don't go searching jQuery if we've already found an element.
       element = element.length > 0 ? element : Behave.view.find(elType + filter);
@@ -45,4 +47,27 @@ Behave.find = function(identifier, type) {
     element = getClosestInput(element);
   }
   return element;
+};
+
+
+Behave.fill = function(identifier) {
+  var $el = this.find(identifier, 'field');
+  var fillWith = function(data) {
+    if ($el.attr('type') === 'checkbox') {
+      $el.prop('checked', data);
+    }else if ($el.attr('type') === 'form') {
+      _.each(data, function(value, el) {
+        Behave.fill(el).with(value);
+      })
+    }
+    else {
+      $el.val(data);
+    }
+  }
+
+  var fillObject = {
+    with: fillWith
+  }
+
+  return fillObject;
 };

@@ -44,7 +44,7 @@
       var jqResult, bResult;
       beforeEach(function() {
         $view.append('<button>Subdomain</button>');
-        $view.append("<a href='www.test.com'>TestLinks</button>");
+        $view.append("<a href='www.test.com'>Practice Url</button>");
         jqResult = $view.find('button:contains(Subdomain)')
       })
       it("should find only clickable type elements and search by containing text", function() {
@@ -63,16 +63,57 @@
         bResult.text().should.eql(jqResult.text());
       });
       it("should find things based on text for a tags", function() {
-        bResult = Behave.find('TestLinks', 'clickable');
-        jqResult = $view.find("a:contains(TestLinks)");
+        bResult = Behave.find('Practice Url', 'clickable');
+        jqResult = $view.find("a:contains(Practice Url)");
         bResult.text().should.eql(jqResult.text());
       });
     });
     describe("with display type elements", function() {
       xit("should return rough matches of text contained in display type elements", function() {
-        //TODO: Create good list of display elements, or maybe just use body:contains ? figure this out.
+        // TODO: Create good list of display elements, or maybe just use body:contains ? figure this out.
       });
     });
+    xdescribe("with icon type elements", function() {
+      // TODO: Create tests for finding icons. Probably check classes and type.
+    });
+    xdescribe("when passing jQuery type selectors", function() {
+      // TODO: Implement me!
+    });
   });
+  describe("#fill", function() {
+    it("should return an object who has a 'with' function", function() {
+      Behave.fill('testPlaceholder').with.should.be.a.Function
+    });
+    describe("using #with", function() {
+      beforeEach(function() {
+        var form = $("<form type='form'></form>")
+        form.append("<input type='checkbox' name='accept_terms'>")
+        form.append("<input type='text' name='first_name'>")
+        $view.append(form)
+      });
+      describe('on individual form elements', function() {
+        it("should fill in the element with the provided data", function() {
+          Behave.fill('testPlaceholder').with('bananas');
+          Behave.find('testPlaceholder').val().should.eql('bananas');
+        })
+        it("should work with checkboxes", function() {
+          Behave.find('accept_terms').prop('checked').should.be.false
+          Behave.fill('accept_terms').with(true);
+          Behave.find('accept_terms').prop('checked').should.be.true
+        });
+      });
+      describe('on a whole form at once', function() {
+        it.only("should fill all the elements provided in the hash", function() {
+          Behave.fill('form').with({
+            accept_terms: true,
+            first_name: 'Joe Shmo',
+            'Practice Url': 'www.yesthisworked.com'
+          });
+          // Behave.find('accept_terms').prop('checked').should.be.true
+          // Behave.find('first_name').prop('checked').should.eql('Joe Shmo')
+          // Behave.find('Practice Url').prop('checked').should.eql('www.yesthisworked.com')
+        })
+      });
+    })
   });
 }());
