@@ -19,25 +19,13 @@ Behave.domTypes = {
     attrOptions: ['contains']
   }
 }
-var getClosestInput = function($el) {
-  var sibling = $el.next();
-  if (sibling.is('input')) {return sibling}
-  var relatedInput = sibling.find('input');
-  return relatedInput.length > 0 ? relatedInput : $el;
-};
-
-var findByClass = function(identifier, elType, prefix) {
-  prefix = prefix || '';
-  elType = elType || '';
-  return Behave.view.find(elType + '.' + prefix + identifier).first();
-}
 
 Behave.find = function(identifier, type) {
   type = type || 'field'
   var searchParams = this.domTypes[type];
   var element = '';
   _.each(searchParams.elementTypes, function(elType) {
-    if (element.length > 0) {
+    if (element.length) {
       // Explicitly returning false kills iteration early in lodash.
       return false;
     }
@@ -55,7 +43,7 @@ Behave.find = function(identifier, type) {
           element = Behave.view.find(elType + filter);
       }
       // Explicitly returning false kills iteration early in lodash.
-      if (element.length > 0) {
+      if (element.length) {
         return false;
       }
     });
@@ -65,7 +53,7 @@ Behave.find = function(identifier, type) {
     element = getClosestInput(element);
   }
   // Fall back to jQuery if we can't find anything
-  if (element.length === 0) {
+  if (!element.length) {
     element = Behave.view.find(identifier);
   }
   return element;
@@ -88,7 +76,7 @@ Behave.fill = function(identifier) {
       return $el.prop('checked', data);
     }
 
-    $el.val(data);
+    $el.val(data).trigger('input');
   }
 
   var fillObject = {
@@ -96,4 +84,53 @@ Behave.fill = function(identifier) {
   }
 
   return fillObject;
+};
+
+Behave.getAllEls = function(element, $els) {
+  element = element || Behave.view;
+  $els = $els || {};
+  var kids = element.children;
+  if (kids.length) {
+    element.children().each(function() {
+      $els = Behave.getAllEls($(this), $els);
+    });
+  }
+  _.each(Behave.domTypes.field.attrOptions, function(attrOption) {
+    var attrVal = cleanVal(element.attr(attrOption));
+    attrVal && ($els[attrVal] = element)
+  });
+  var elText = element.text();
+  if(elText) {$els[cleanVal(elText)] = element;}
+  return $els;
+};
+
+
+// PRIVATE FUNCTIONS
+var getClosestInput = function($el) {
+  var sibling = $el.next();
+  if (sibling.is('input')) {return sibling}
+  var relatedInput = sibling.find('input');
+  return relatedInput.length ? relatedInput : $el;
+};
+
+var findByClass = function(identifier, elType, prefix) {
+  prefix = prefix || '';
+  elType = elType || '';
+  return Behave.view.find(elType + '.' + prefix + identifier).first();
+}
+
+var cleanVal = function(val) {
+  if (!val) {return;}
+
+  // Remove any spaces.
+  val = val.replace(' ', '');
+
+  if (val.indexOf('-') !== -1) {
+    // camelCasing attrs with dashes in them.
+    var words = val.split('-');
+    words[1] = words[1][0].toUpperCase() + words[1].substring(1);
+    words[2] && (words[2] = words[2][0].toUpperCase() + words[2].substring(1))
+    val =  words.join('');
+  }
+  return val;
 };
