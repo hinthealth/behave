@@ -20,6 +20,8 @@ Behave.domTypes = {
   }
 }
 
+Behave.getAllElsAttrOptions = ['name', 'for', 'placeholder', 'type', 'test-me']
+
 Behave.find = function(identifier, type) {
   type = type || 'field'
   var searchParams = this.domTypes[type];
@@ -95,7 +97,7 @@ Behave.getAllEls = function(element, $els) {
       $els = Behave.getAllEls($(this), $els);
     });
   }
-  _.each(Behave.domTypes.field.attrOptions, function(attrOption) {
+  _.each(Behave.getAllElsAttrOptions, function(attrOption) {
     var attrVal = cleanVal(element.attr(attrOption));
     attrVal && ($els[attrVal] = element)
   });
