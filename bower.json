@@ -16,7 +16,7 @@
     "angular"
   ],
   "license": "Private",
-  "private": true,
+  "private": false,
   "ignore": [
     "**/.*",
     "node_modules",
