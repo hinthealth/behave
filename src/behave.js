@@ -4,19 +4,19 @@ Behave.view = $(document.body);
 Behave.domTypes = {
   field: {
     elementTypes: ['input', 'select', 'option', 'label', 'textarea', 'form'],
-    attrOptions: ['name', 'for', 'placeholder', 'contains', 'type']
+    attrOptions: ['name', 'for', 'placeholder', 'contains', 'type', 'test-me']
   },
   clickable: {
     elementTypes: ['button', 'a'],
-    attrOptions: ['contains', 'href']
+    attrOptions: ['contains', 'href', 'test-me']
   },
   icon: {
     elementTypes: ['icon', 'div', 'span'],
-    attrOptions: ['type', 'class']
+    attrOptions: ['type', 'class', 'test-me']
   },
   display: {
-    elementTypes: ['div', 'p', 'label', 'span', 'h1', 'h2', 'h3', 'h4', 'h5'],
-    attrOptions: ['contains']
+    elementTypes: [''], // This is actually all elements, since there's no leading el type
+    attrOptions: ['test-me', 'contains']
   }
 }
 
