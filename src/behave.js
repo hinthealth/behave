@@ -23,33 +23,34 @@ Behave.domTypes = {
 Behave.getAllElsAttrOptions = ['name', 'for', 'placeholder', 'type', 'test-me']
 
 Behave.find = function(identifier, type) {
-  type = type || 'field'
-  var searchParams = this.domTypes[type];
   var element = '';
-  _.each(searchParams.elementTypes, function(elType) {
-    if (element.length) {
-      // Explicitly returning false kills iteration early in lodash.
-      return false;
-    }
-    _.each(searchParams.attrOptions, function(attrOption) {
-      switch (attrOption) {
-        case 'contains':
-          var filter = ":contains(" + identifier + ")"
-          element = Behave.view.find(elType + filter);
-          break;
-        case 'class':
-          element = findByClass(identifier, elType, 'glyphicon-');
-          break;
-        default:
-          var filter = "[" + attrOption + "='" + identifier + "']";
-          element = Behave.view.find(elType + filter);
-      }
-      // Explicitly returning false kills iteration early in lodash.
+  var searchOptions = type ? {specificOption: Behave.domTypes[type]} : Behave.domTypes;
+  _.each(searchOptions, function(searchParams) {
+    _.each(searchParams.elementTypes, function(elType) {
       if (element.length) {
+        // Explicitly returning false kills iteration early in lodash.
         return false;
       }
+      _.each(searchParams.attrOptions, function(attrOption) {
+        switch (attrOption) {
+          case 'contains':
+            var filter = ":contains(" + identifier + ")"
+            element = Behave.view.find(elType + filter);
+            break;
+          case 'class':
+            element = findByClass(identifier, elType, 'glyphicon-');
+            break;
+          default:
+            var filter = "[" + attrOption + "='" + identifier + "']";
+            element = Behave.view.find(elType + filter);
+        }
+        // Explicitly returning false kills iteration early in lodash.
+        if (element.length) {
+          return false;
+        }
+      });
     });
-  });
+  })
 
   if (element && element.is('label')) {
     element = getClosestInput(element);
@@ -63,7 +64,9 @@ Behave.find = function(identifier, type) {
 
 
 Behave.fill = function(identifier) {
-  var $el = this.find(identifier, 'field');
+  // If id is already jQuery, just go with it. Useful if you've set a variable using Behave.find, and then want to
+  // reuse that variable in a fill later on.
+  var $el = identifier instanceof jQuery ? identifier : Behave.find(identifier, 'field');
   var fillWith = function(data) {
     if ($el.is('form') || $el.attr('type') === 'form') {
       if (!_.isObject(data)) {
@@ -99,6 +102,11 @@ Behave.getAllEls = function(element, $els) {
   }
   _.each(Behave.getAllElsAttrOptions, function(attrOption) {
     var attrVal = cleanVal(element.attr(attrOption));
+    if (attrVal) {
+      element.reload = function() {
+        return Behave.find(attrVal);
+      }
+    }
     attrVal && ($els[attrVal] = element)
   });
   var elText = element.text();
@@ -136,3 +144,8 @@ var cleanVal = function(val) {
   }
   return val;
 };
+
+// Set functions to the window for convenience
+window.find = Behave.find;
+window.fill = Behave.fill
+

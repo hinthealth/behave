@@ -156,5 +156,8 @@
     it("should concatenate the text of label elements", function() {
       $els.PracticeUrl.should.be.an.Object
     });
+    xit("should give each element a reload method", function() {
+      // Need to test this properly, but it works for our angular testing;
+    });
   });
 }());
