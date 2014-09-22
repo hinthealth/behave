@@ -33,10 +33,10 @@ that would typically show up in a form ('input', 'select', 'option', 'label', 't
 
 ** FIND **
 Under the hood of "fill" is a robust "find" function. The signature is...
-`Behave.find(identifier, type)`
+`Behave.find(identifier, [type])`
 
-Thus, try to give it something unique, but if it's not, you can specify a "type" of DOM element to narrow the search
-by doing...
+Type is optional. Thus, try to give it something unique, but if your searching for something that's not, 
+you can specify a "type" of DOM element to narrow the search by doing...
 ```
 Behave.find('email', 'field') // Finds els of type 'input', 'select', 'option', 'label', 'textarea', or 'form'
 Behave.find('Sign Up', 'clickable') // Finds els of type 'button', or 'a'
