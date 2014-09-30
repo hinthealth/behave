@@ -15,10 +15,12 @@ Before:
    $("[for='dob']").val('04/27/87').trigger('input');
   ```
 
-With Behave!:
-  ` fill('form').with({email: 'joeShmo@gmail.com', age: 27, dob: '04/27/87'});`
+Now with Behave!:
+  ```
+  fill('form').with({email: 'joeShmo@gmail.com', age: 27, dob: '04/27/87'});
+  ```
 
-the fill function also takes individual fields, or jQuery elements as input.
+You can also fill individual fields, or jQuery elements as input.
   ```
    fill('myOtherEl').with('new text');
 
@@ -31,7 +33,8 @@ forms conform to general standards, it will likely find them. It searches for at
 name, for, placeholder, type, actual text, and others. Fill only looks through element types
 that would typically show up in a form ('input', 'select', 'option', 'label', 'textarea', or 'form').
 
-** FIND **
+***FIND***
+
 Under the hood of "fill" is a robust "find" function. The signature is...
 `Behave.find(identifier, [type])`
 
