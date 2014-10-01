@@ -1,5 +1,10 @@
-window.Behave = {};
+// Little jQuery extension to have exact equals;
+$.expr[':'].textEquals = function(a, i, m) {
+    var match = $(a).text().match("^" + m[3] + "$")
+    return match && match.length > 0;
+}
 
+window.Behave = {};
 Behave.view = $(document.body);
 Behave.domTypes = {
   field: {
@@ -34,7 +39,7 @@ Behave.find = function(identifier, type) {
       _.each(searchParams.attrOptions, function(attrOption) {
         switch (attrOption) {
           case 'contains':
-            var filter = ":contains(" + identifier + ")"
+            var filter = ":textEquals("+ identifier + ")"
             element = Behave.view.find(elType + filter);
             break;
           case 'class':

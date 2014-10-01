@@ -44,7 +44,7 @@ you can specify a "type" of DOM element to narrow the search by doing...
 Behave.find('email', 'field') // Finds els of type 'input', 'select', 'option', 'label', 'textarea', or 'form'
 Behave.find('Sign Up', 'clickable') // Finds els of type 'button', or 'a'
 Behave.find('danger', 'icon') // Finds els of type 'icon', 'div', or 'span'
-Behave.find('Birthday', 'display') // Searches text of all elements.
+Behave.find('Birthday', 'display') // Searches EXACT text of all elements.
 ```
 
 Behave also finds and makes available each element on your page instantly! Let's say your page is...

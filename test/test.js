@@ -53,9 +53,12 @@
         bResult.is('button').should.eql(true);
         bResult.text().should.eql(jqResult.text());
       });
-      it("should default to doing a rough search", function() {
-        var bResult = Behave.find('Subdo', 'clickable');
-        bResult.text().should.eql(jqResult.text());
+      it("should default to doing an exact search", function() {
+        var bRoughResult = Behave.find('Subdo', 'clickable');
+        var bExactResult = Behave.find('Subdomain', 'clickable');
+        bRoughResult.is('button').should.eql(false);
+        bExactResult.is('button').should.eql(true);
+        bExactResult.text().should.eql(jqResult.text());
       });
       it("should find things based on href", function() {
         bResult = Behave.find("www.test.com", 'clickable');
