@@ -1,6 +1,6 @@
 {
   "name": "behave",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "authors": [
     "Blake West <bwest87@gmail.com>"
   ],
@@ -26,6 +26,6 @@
   ],
   "dependencies": {
     "jQuery": "~2.0.3",
-    "lodash": "~2.2.1"
+    "lodash": "^2.2.1"
   }
 }
