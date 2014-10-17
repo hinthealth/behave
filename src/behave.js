@@ -149,6 +149,17 @@ Behave.getAllEls = function(element, $els) {
   return $els;
 };
 
+Behave.bexpect = function(identifier, opts) {
+  if (_.isObject(jasmine)) {
+    if (_.isString(identifier)) {
+      return jasmine.getGlobal().expect(Behave.find(identifier, opts));
+    }
+    return jasmine.getGlobal().expect(identifier);
+  }
+
+  throw new Error("It appears jasmine or expect isn't defined. Thus Behave can't delegate expect");
+};
+
 
 // PRIVATE FUNCTIONS
 var tryToFind = function(expression) {
@@ -217,4 +228,5 @@ window.find = Behave.find;
 window.fill = Behave.fill;
 window.findAll = Behave.findAll;
 window.tryFind = Behave.tryFind;
+window.bexpect = Behave.bexpect;
 
