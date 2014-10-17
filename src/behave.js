@@ -1,6 +1,6 @@
 // Little jQuery extension to have exact equals;
 $.expr[':'].textEquals = function(a, i, m) {
-    var match = $(a).text().match("^" + m[3] + "$")
+    var match = $(a).text().trim().match("^" + m[3] + "$")
     return match && match.length > 0;
 }
 
@@ -32,10 +32,9 @@ Behave.find = function(identifier, type) {
   var searchOptions = type ? {specificOption: Behave.domTypes[type]} : Behave.domTypes;
   _.each(searchOptions, function(searchParams) {
     _.each(searchParams.elementTypes, function(elType) {
-      if (element.length) {
-        // Explicitly returning false kills iteration early in lodash.
-        return false;
-      }
+      // Explicitly returning false kills iteration early in lodash.
+      if (element.length) {return false;}
+
       _.each(searchParams.attrOptions, function(attrOption) {
         switch (attrOption) {
           case 'contains':

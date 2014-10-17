@@ -1,16 +1,17 @@
 /* jshint immed: false */
-/* globals Replicator, describe, beforeEach, it, xdescribe, templates */
+/* globals Replicator, describe, beforeEach, it, xdescribe, templates, Behave */
+/* quotmark: true*/
 
 (function () {
 'use strict';
   var $view;
   beforeEach(function() {
-    Behave.view = $view = $(templates.signup)
+    Behave.view = $view = $(templates.signup);
   });
   describe('#find', function() {
     describe("with field type elements", function() {
       it("should, by default, look for field type elements", function() {
-        $view.append('div[name=subdomain]')
+        $view.append('div[name=subdomain]');
         var jqSubdomain = $view.find("input[name='subdomain']");
         var bSubdomain = Behave.find('subdomain');
         bSubdomain.attr('ng-model').should.eql(jqSubdomain.attr('ng-model'));
@@ -40,12 +41,45 @@
         bSubdomain.attr('ng-model').should.eql(correspondingInput.attr('ng-model'));
       });
     });
+
+    describe("searching by text", function() {
+      describe("with exact matching", function() {
+        beforeEach(function() {
+          Behave.view = $view = $(templates.invoiceOne);
+        });
+        it("should only find things with the exact text", function() {
+          var jqResult = $view.find("a:contains('Back to All Invoices')");
+          var bResultNotExact = Behave.find("Back to All");
+          var bResultExact = Behave.find("Back to All Invoices");
+          bResultExact.text().should == "Back to All Invoices";
+          bResultExact.text().should.eql(jqResult.text());
+          bResultNotExact.text().should.eql('');
+        });
+      });
+      describe("when using rough match", function() {
+        beforeEach(function() {
+          $view.append("<div>Worked!</div>")
+          $view.append("<div>WorkedAgain!</div>")
+          $view.append("<div>Success: This is alert text that could be many things!</div>")
+        });
+        it("should find multiple results if multiple things match", function() {
+          var bResult = Behave.find('~Worked!');
+          var jqResult = $view.find(":contains('Worked!')");
+          bResult.length.should.eql(2);
+          bResult.length.should.eql(jqResult.length);
+        });
+        it("should find a match if any of the letters are contained in the text of another", function() {
+          var bResult = Behave.find('~Success!');
+        });
+        it("should not be case sensitive")
+      });
+    });
     describe("with clickable type elements", function() {
       var jqResult, bResult;
       beforeEach(function() {
-        $view.append('<button>Subdomain</button>');
+        $view.append("<button>Subdomain</button>");
         $view.append("<a href='www.test.com'>Practice Url</button>");
-        jqResult = $view.find('button:contains(Subdomain)')
+        jqResult = $view.find('button:contains(Subdomain)');
       })
       it("should find only clickable type elements and search by containing text", function() {
         bResult = Behave.find('Subdomain', 'clickable');
