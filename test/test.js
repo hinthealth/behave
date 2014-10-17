@@ -9,6 +9,13 @@
     Behave.view = $view = $(templates.signup);
   });
   describe('#find', function() {
+    describe("when no element is found", function() {
+      it("should throw an error", function() {
+        (function() {
+          var el = Behave.find("TOTALLY NOT HERE")
+        }).should.throw("Can't find element identified by TOTALLY NOT HERE");
+      });
+    });
     describe("with field type elements", function() {
       it("should, by default, look for field type elements", function() {
         $view.append('div[name=subdomain]');
@@ -42,6 +49,28 @@
       });
     });
 
+    describe("when multiple things match", function() {
+      beforeEach(function() {
+        Behave.view.append("<div>Worked!</div>")
+        Behave.view.append("<div>WorkedAgain!</div>")
+      });
+      it("should throw an error if multiple things match", function() {
+        (function() {
+          Behave.find('~Worked')
+        }).should.throw('Matched multiple elements identified by ~Worked. Use findAll if that\'s what you expect.');
+      });
+      describe("using find all", function() {
+        it("should be totally fine", function() {
+          (function() {
+            Behave.findAll('~Worked');
+          }).should.not.throw();
+        });
+        it("should return the correct number of elements", function() {
+          Behave.findAll('~Worked').length.should.eql(2);
+        });
+      });
+    });
+
     describe("searching by text", function() {
       describe("with exact matching", function() {
         beforeEach(function() {
@@ -49,7 +78,7 @@
         });
         it("should only find things with the exact text", function() {
           var jqResult = $view.find("a:contains('Back to All Invoices')");
-          var bResultNotExact = Behave.find("Back to All");
+          var bResultNotExact = Behave.tryFind("Back to All");
           var bResultExact = Behave.find("Back to All Invoices");
           bResultExact.text().should == "Back to All Invoices";
           bResultExact.text().should.eql(jqResult.text());
@@ -58,20 +87,16 @@
       });
       describe("when using rough match", function() {
         beforeEach(function() {
-          $view.append("<div>Worked!</div>")
-          $view.append("<div>WorkedAgain!</div>")
-          $view.append("<div>Success: This is alert text that could be many things!</div>")
+          Behave.view.append("<div>Success: This is alert text that could be many things!</div>")
         });
-        it("should find multiple results if multiple things match", function() {
-          var bResult = Behave.find('~Worked');
-          var jqResult = $view.find(":contains('Worked')");
-          bResult.length.should.eql(2);
-          bResult.length.should.eql(jqResult.length);
+        it("should find a substring match", function() {
+          var bResult = Behave.find('~Success');
+          bResult.text().should.eql("Success: This is alert text that could be many things!");
         });
-        it("should find a match if any of the letters are contained in the text of another", function() {
-          var bResult = Behave.find('~Success!');
+        it("should not be case sensitive", function() {
+          var bResult = Behave.find('~sUcCess');
+          bResult.text().should.eql('Success: This is alert text that could be many things!');
         });
-        it("should not be case sensitive")
       });
     });
     describe("with clickable type elements", function() {
@@ -86,13 +111,6 @@
         bResult.is('input').should.eql(false);
         bResult.is('button').should.eql(true);
         bResult.text().should.eql(jqResult.text());
-      });
-      it("should default to doing an exact search", function() {
-        var bRoughResult = Behave.find('Subdo', 'clickable');
-        var bExactResult = Behave.find('Subdomain', 'clickable');
-        bRoughResult.is('button').should.eql(false);
-        bExactResult.is('button').should.eql(true);
-        bExactResult.text().should.eql(jqResult.text());
       });
       it("should find things based on href", function() {
         bResult = Behave.find("www.test.com", 'clickable');

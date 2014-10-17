@@ -1,9 +1,18 @@
 'use strict';
-// Little jQuery extension to have exact equals;
-$.expr[':'].textEquals = function(a, i, m) {
-    var match = $(a).text().trim().match("^" + m[3] + "$")
+// Little jQuery extension for exact and rough text matching
+$.expr[':'].textEquals = function(el, i, m) {
+    var textToMatch = m[3];
+    var match = $(el).text().trim().match("^" + textToMatch + "$")
     return match && match.length > 0;
-}
+};
+
+// This is similar to contains, except not case sensitive.
+$.expr[':'].textRoughMatch = function(el, i, m) {
+    var textToMatch = m[3];
+    var elText = $(el).text().toLowerCase();
+    var res = elText.toLowerCase().indexOf(textToMatch.toLowerCase()) !== -1;
+    return res;
+};
 
 window.Behave = {};
 Behave.view = $(document.body);
@@ -21,14 +30,16 @@ Behave.domTypes = {
     attrOptions: ['type', 'class', 'test-me']
   },
   display: {
-    elementTypes: [''], // This is actually all elements, since there's no leading el type
+    // The empty string is actually all elements, since there's no leading el type
+    elementTypes: ['table', 'tr', 'td', 'th', ''],
     attrOptions: ['test-me', 'contains']
   }
-}
+};
 
-Behave.getAllElsAttrOptions = ['name', 'for', 'placeholder', 'type', 'test-me']
+Behave.getAllElsAttrOptions = ['name', 'for', 'placeholder', 'type', 'test-me'];
 
-Behave.find = function(identifier, type) {
+Behave.find = function(identifier, type, opts) {
+  opts = opts || {};
   var element = '';
   var searchOptions = type ? {specificOption: Behave.domTypes[type]} : Behave.domTypes;
   _.each(searchOptions, function(searchParams) {
@@ -39,14 +50,14 @@ Behave.find = function(identifier, type) {
       _.each(searchParams.attrOptions, function(attrOption) {
         switch (attrOption) {
           case 'contains':
-            element = findByText(identifier, elType)
+            element = findByText(identifier, elType);
             break;
           case 'class':
             element = findByClass(identifier, elType);
             break;
           default:
             var filter = "[" + attrOption + "='" + identifier + "']";
-            element = tryFind(elType + filter);
+            element = tryToFind(elType + filter);
         }
         // Explicitly returning false kills iteration early in lodash.
         if (element.length) {
@@ -54,16 +65,35 @@ Behave.find = function(identifier, type) {
         }
       });
     });
-  })
+  });
 
   if (element && element.is('label')) {
     element = getClosestInput(element);
   }
   // Fall back to jQuery if we can't find anything
   if (!element.length) {
-    element = tryFind(identifier);
+    element = tryToFind(identifier);
   }
+
+  // No element has been found, and we're in error mode.
+  if (!element.length && !opts.noErrors) {
+    throw new Error('Can\'t find element identified by ' + identifier);
+  }
+
+  // We found too many things
+  if (element.length > 1 && !opts.findMany) {
+    throw new Error('Matched multiple elements identified by ' + identifier + '. Use findAll if that\'s what you expect.')
+  }
+
   return element;
+};
+
+Behave.tryFind = function(identifier, type) {
+  return Behave.find(identifier, type, {noErrors: true});
+};
+
+Behave.findAll = function(identifier, type) {
+  return Behave.find(identifier, type, {findMany: true});
 };
 
 
@@ -121,10 +151,9 @@ Behave.getAllEls = function(element, $els) {
 
 
 // PRIVATE FUNCTIONS
-var tryFind = function(expression) {
+var tryToFind = function(expression) {
   var el = '';
   try {
-    console.log(expression);
     el = Behave.view.find(expression);
   }
   catch (e) {
@@ -150,7 +179,7 @@ var findByClass = function(identifier, elType) {
   elType = elType || '';
   var expression = elType + '.' + prefix + identifier;
 
-  return tryFind(expression).first();
+  return tryToFind(expression).first();
 };
 
 var findByText = function(identifier, elType) {
@@ -159,12 +188,12 @@ var findByText = function(identifier, elType) {
 
   if (identifier[0] === '~') {
     identifier = identifier.slice(1);
-    filterMethod = ":contains";
+    filterMethod = ":textRoughMatch";
   }
   filterString = filterMethod + "('" + identifier + "')";
   expression = elType + filterString;
 
-  return tryFind(expression);
+  return tryToFind(expression);
 };
 
 var cleanVal = function(val) {
