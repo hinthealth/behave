@@ -169,7 +169,7 @@ var tryToFind = function(expression) {
 
 var getClosestInput = function($el) {
   var sibling = $el.next();
-  if (sibling.is('input')) {return sibling}
+  if (sibling.is('input')) {return sibling;}
   var relatedInput = sibling.find('input');
   return relatedInput.length ? relatedInput : $el;
 };
@@ -214,5 +214,7 @@ var cleanVal = function(val) {
 
 // Set functions to the window for convenience
 window.find = Behave.find;
-window.fill = Behave.fill
+window.fill = Behave.fill;
+window.findAll = Behave.findAll;
+window.tryFind = Behave.tryFind;
 
