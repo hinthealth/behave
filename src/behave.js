@@ -1,3 +1,4 @@
+'use strict';
 // Little jQuery extension to have exact equals;
 $.expr[':'].textEquals = function(a, i, m) {
     var match = $(a).text().trim().match("^" + m[3] + "$")
@@ -38,15 +39,14 @@ Behave.find = function(identifier, type) {
       _.each(searchParams.attrOptions, function(attrOption) {
         switch (attrOption) {
           case 'contains':
-            var filter = ":textEquals("+ identifier + ")"
-            element = Behave.view.find(elType + filter);
+            element = findByText(identifier, elType)
             break;
           case 'class':
-            element = findByClass(identifier, elType, 'glyphicon-');
+            element = findByClass(identifier, elType);
             break;
           default:
             var filter = "[" + attrOption + "='" + identifier + "']";
-            element = Behave.view.find(elType + filter);
+            element = tryFind(elType + filter);
         }
         // Explicitly returning false kills iteration early in lodash.
         if (element.length) {
@@ -61,7 +61,7 @@ Behave.find = function(identifier, type) {
   }
   // Fall back to jQuery if we can't find anything
   if (!element.length) {
-    element = Behave.view.find(identifier);
+    element = tryFind(identifier);
   }
   return element;
 };
@@ -71,6 +71,7 @@ Behave.fill = function(identifier) {
   // If id is already jQuery, just go with it. Useful if you've set a variable using Behave.find, and then want to
   // reuse that variable in a fill later on.
   var $el = identifier instanceof jQuery ? identifier : Behave.find(identifier, 'field');
+
   var fillWith = function(data) {
     if ($el.is('form') || $el.attr('type') === 'form') {
       if (!_.isObject(data)) {
@@ -120,6 +121,23 @@ Behave.getAllEls = function(element, $els) {
 
 
 // PRIVATE FUNCTIONS
+var tryFind = function(expression) {
+  var el = '';
+  try {
+    console.log(expression);
+    el = Behave.view.find(expression);
+  }
+  catch (e) {
+    // Syntax errors occur sometimes when trying to do certain operations
+    // with ~'s and such. We just want it to return nothing in this case.
+    if ( !(_.contains(e.message, "Syntax error")) ) {
+      // Re throw if it's not a syntax errors
+      throw (e)
+    }
+  }
+  return $(el);
+};
+
 var getClosestInput = function($el) {
   var sibling = $el.next();
   if (sibling.is('input')) {return sibling}
@@ -127,11 +145,27 @@ var getClosestInput = function($el) {
   return relatedInput.length ? relatedInput : $el;
 };
 
-var findByClass = function(identifier, elType, prefix) {
-  prefix = prefix || '';
+var findByClass = function(identifier, elType) {
+  var prefix = _.contains(['icon', 'div', 'span'], elType) ? 'glyphicon-' : '';
   elType = elType || '';
-  return Behave.view.find(elType + '.' + prefix + identifier).first();
-}
+  var expression = elType + '.' + prefix + identifier;
+
+  return tryFind(expression).first();
+};
+
+var findByText = function(identifier, elType) {
+  var filterMethod, filterString, expression;
+  filterMethod = ":textEquals";
+
+  if (identifier[0] === '~') {
+    identifier = identifier.slice(1);
+    filterMethod = ":contains";
+  }
+  filterString = filterMethod + "('" + identifier + "')";
+  expression = elType + filterString;
+
+  return tryFind(expression);
+};
 
 var cleanVal = function(val) {
   if (!val) {return;}
@@ -139,7 +173,7 @@ var cleanVal = function(val) {
   // Remove any spaces.
   val = val.replace(' ', '');
 
-  if (val.indexOf('-') !== -1) {
+  if (_.contains(val, '-')) {
     // camelCasing attrs with dashes in them.
     var words = val.split('-');
     words[1] = words[1][0].toUpperCase() + words[1].substring(1);

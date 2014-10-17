@@ -63,8 +63,8 @@
           $view.append("<div>Success: This is alert text that could be many things!</div>")
         });
         it("should find multiple results if multiple things match", function() {
-          var bResult = Behave.find('~Worked!');
-          var jqResult = $view.find(":contains('Worked!')");
+          var bResult = Behave.find('~Worked');
+          var jqResult = $view.find(":contains('Worked')");
           bResult.length.should.eql(2);
           bResult.length.should.eql(jqResult.length);
         });
@@ -103,11 +103,6 @@
         bResult = Behave.find('Practice Url', 'clickable');
         jqResult = $view.find("a:contains(Practice Url)");
         bResult.text().should.eql(jqResult.text());
-      });
-    });
-    describe("with display type elements", function() {
-      xit("should return rough matches of text contained in display type elements", function() {
-        // TODO: Create good list of display elements, or maybe just use body:contains ? figure this out.
       });
     });
     describe("with icon type elements", function() {
