@@ -1,16 +1,24 @@
 /* jshint immed: false */
-/* globals Replicator, describe, beforeEach, it, xdescribe, templates */
+/* globals Replicator, describe, beforeEach, it, xdescribe, templates, Behave */
+/* quotmark: true*/
 
 (function () {
 'use strict';
   var $view;
   beforeEach(function() {
-    Behave.view = $view = $(templates.signup)
+    Behave.view = $view = $(templates.signup);
   });
   describe('#find', function() {
+    describe("when no element is found", function() {
+      it("should throw an error", function() {
+        (function() {
+          var el = Behave.find("TOTALLY NOT HERE")
+        }).should.throw("Can't find element identified by TOTALLY NOT HERE");
+      });
+    });
     describe("with field type elements", function() {
       it("should, by default, look for field type elements", function() {
-        $view.append('div[name=subdomain]')
+        $view.append('div[name=subdomain]');
         var jqSubdomain = $view.find("input[name='subdomain']");
         var bSubdomain = Behave.find('subdomain');
         bSubdomain.attr('ng-model').should.eql(jqSubdomain.attr('ng-model'));
@@ -40,25 +48,69 @@
         bSubdomain.attr('ng-model').should.eql(correspondingInput.attr('ng-model'));
       });
     });
+
+    describe("when multiple things match", function() {
+      beforeEach(function() {
+        Behave.view.append("<div>Worked!</div>")
+        Behave.view.append("<div>WorkedAgain!</div>")
+      });
+      it("should throw an error if multiple things match", function() {
+        (function() {
+          Behave.find('~Worked')
+        }).should.throw('Matched multiple elements identified by ~Worked. Use findAll if that\'s what you expect.');
+      });
+      describe("using find all", function() {
+        it("should be totally fine", function() {
+          (function() {
+            Behave.findAll('~Worked');
+          }).should.not.throw();
+        });
+        it("should return the correct number of elements", function() {
+          Behave.findAll('~Worked').length.should.eql(2);
+        });
+      });
+    });
+
+    describe("searching by text", function() {
+      describe("with exact matching", function() {
+        beforeEach(function() {
+          Behave.view = $view = $(templates.invoiceOne);
+        });
+        it("should only find things with the exact text", function() {
+          var jqResult = $view.find("a:contains('Back to All Invoices')");
+          var bResultNotExact = Behave.tryFind("Back to All");
+          var bResultExact = Behave.find("Back to All Invoices");
+          bResultExact.text().should == "Back to All Invoices";
+          bResultExact.text().should.eql(jqResult.text());
+          bResultNotExact.text().should.eql('');
+        });
+      });
+      describe("when using rough match", function() {
+        beforeEach(function() {
+          Behave.view.append("<div>Success: This is alert text that could be many things!</div>")
+        });
+        it("should find a substring match", function() {
+          var bResult = Behave.find('~Success');
+          bResult.text().should.eql("Success: This is alert text that could be many things!");
+        });
+        it("should not be case sensitive", function() {
+          var bResult = Behave.find('~sUcCess');
+          bResult.text().should.eql('Success: This is alert text that could be many things!');
+        });
+      });
+    });
     describe("with clickable type elements", function() {
       var jqResult, bResult;
       beforeEach(function() {
-        $view.append('<button>Subdomain</button>');
+        $view.append("<button>Subdomain</button>");
         $view.append("<a href='www.test.com'>Practice Url</button>");
-        jqResult = $view.find('button:contains(Subdomain)')
+        jqResult = $view.find('button:contains(Subdomain)');
       })
       it("should find only clickable type elements and search by containing text", function() {
         bResult = Behave.find('Subdomain', 'clickable');
         bResult.is('input').should.eql(false);
         bResult.is('button').should.eql(true);
         bResult.text().should.eql(jqResult.text());
-      });
-      it("should default to doing an exact search", function() {
-        var bRoughResult = Behave.find('Subdo', 'clickable');
-        var bExactResult = Behave.find('Subdomain', 'clickable');
-        bRoughResult.is('button').should.eql(false);
-        bExactResult.is('button').should.eql(true);
-        bExactResult.text().should.eql(jqResult.text());
       });
       it("should find things based on href", function() {
         bResult = Behave.find("www.test.com", 'clickable');
@@ -69,11 +121,6 @@
         bResult = Behave.find('Practice Url', 'clickable');
         jqResult = $view.find("a:contains(Practice Url)");
         bResult.text().should.eql(jqResult.text());
-      });
-    });
-    describe("with display type elements", function() {
-      xit("should return rough matches of text contained in display type elements", function() {
-        // TODO: Create good list of display elements, or maybe just use body:contains ? figure this out.
       });
     });
     describe("with icon type elements", function() {
@@ -137,30 +184,18 @@
       });
     })
   });
-  describe("#getAllEls", function() {
-    var $els;
+  xdescribe("#click", function() {
+    it("would be annoying to test, but I manually tested this");
+  });
+  describe("#choose/from", function() {
     beforeEach(function() {
-      var form = $("<form type='form'></form>")
-      form.append("<input type='checkbox' name='accept_terms'>")
-      form.append("<input type='text' name='first_name'>")
-      form.append("<label for='practice_url'>Practice Url</label>")
-      form.append("<input type='text' name='practice_url'>")
-      $view.append("<div name='coupon-container'></div>")
-      $view.append(form)
-      $els = Behave.getAllEls();
+      Behave.view = $view = $(templates.dropdowns);
     });
-    it("should create an object with jQ elements from the whole page", function() {
-      $els.accept_terms.attr('name').should.eql(Behave.find('accept_terms').attr('name'));
-      $els.first_name.attr('name').should.eql(Behave.find('first_name').attr('name'));
-    });
-    it("should camelCase elements with attrs that are dash-cased", function() {
-      $els.couponContainer.should.be.an.Object
-    });
-    it("should concatenate the text of label elements", function() {
-      $els.PracticeUrl.should.be.an.Object
-    });
-    xit("should give each element a reload method", function() {
-      // Need to test this properly, but it works for our angular testing;
+    it("should select a dropdown", function() {
+      var coupon = Behave.choose('InactiveCoupon').from('coupons');
+      coupon.val().should.eql('InactiveCoupon');
+      coupon = Behave.choose('ActiveCoupon').from('coupons');
+      coupon.val().should.eql('ActiveCoupon');
     });
   });
 }());

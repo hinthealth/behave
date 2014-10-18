@@ -57,4 +57,87 @@
     "      </div>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "</form>"
+    "</form>";
+
+  templates.invoiceOne =
+    "<div class='panel panel-default'>\n" +
+    "  <div class='panel-body scrollable'>\n" +
+    "    <h4 test-me='invoice-number'>Invoice # {{data.invoice.invoice_number}}</h4>\n" +
+    "    <div app-alerts></div>\n" +
+    "    <div class='form-horizontal' test-me='invoice-info'>\n" +
+    "      <div class='row'>\n" +
+    "        <div class='col-sm-6'>\n" +
+    "          <div class='form-group'>\n" +
+    "            <label class='col-xs-4 control-label'>Total</label>\n" +
+    "            <div class='col-xs-8'>\n" +
+    "              <p class='bold-large form-control-static'>\n" +
+    "                {{data.invoice.amount_in_cents | fromCents | currency }}\n" +
+    "              </p>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "        <div class='col-sm-6'>\n" +
+    "          <div class='form-group'>\n" +
+    "            <label class='col-xs-4 control-label'>Payment Status</label>\n" +
+    "            <div class='col-xs-8'>\n" +
+    "              <p class='form-control-static'>\n" +
+    "                <div class='col-xs-4' test-me='status' hi-label-maker='{{data.invoice.human_status}}'></div>\n" +
+    "                <span>&nbsp;</span>\n" +
+    "                <span class='clickable glyphicon glyphicon-info-sign' data-placement='bottom' bs-popover='popover' data-trigger='hover' data-template='/templates/popover/payments_history' ng-if='data.invoice.payments.length'></span>\n" +
+    "              </p>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "        <div class='col-sm-6'>\n" +
+    "          <div class='form-group'>\n" +
+    "            <label class='col-xs-4 control-label'>Billed On</label>\n" +
+    "            <div class='col-xs-8'>\n" +
+    "              <p class='form-control-static'>\n" +
+    "                {{data.invoice.invoice_date | date}}\n" +
+    "              </p>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "        <div class='col-sm-6'>\n" +
+    "          <div class='form-group'>\n" +
+    "            <div class='col-xs-8 col-xs-offset-4'>\n" +
+    "              <button class='btn btn-md btn-primary' type='submit' ng-hide=\"data.invoice.human_status === 'paid'\" ng-click='showModal()' test-me='open-mark-as-paid'>\n" +
+    "                Mark as Paid\n" +
+    "              </button>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </div>\n" +
+    "    <br>\n" +
+    "    <div ng-include=\"'/templates/employees/enrollment_changes_table'\"></div>\n" +
+    "    <br>\n" +
+    "    <div ng-include=\"'/templates/employees/enrollments_for_invoice_table'\"></div>\n" +
+    "  </div>\n" +
+    "  <div class='panel-footer'>\n" +
+    "    <div class='pager'>\n" +
+    "      <a class='btn btn-secondary' ui-sref='^' test-me='open-mark-as-paid'>\n" +
+    "        Back to All Invoices\n" +
+    "      </a>\n" +
+    "      <button class='btn btn-md btn-primary' type='submit' ng-hide=\"data.invoice.human_status === 'paid'\" ng-click='showModal()'>\n" +
+    "        Mark as Paid\n" +
+    "      </button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</div>";
+
+  templates.dropdowns =
+    "    <div class='row' ng-hide='show.addCoupon'>\n" +
+    "      <div class='col-xs-8'>\n" +
+    "        <select class='form-control' test-me='coupons'>\n" +
+    "          <option value='InactiveCoupon'>Inactive Coupon</option>\n" +
+    "          <option value='ActiveCoupon'>Active Coupon</option>\n" +
+    "        </select>\n" +
+    "      </div>\n" +
+    "      <div class='col-xs-4'>\n" +
+    "        <a class='btn btn-default' href='' ng-click='removeCoupon()'>\n" +
+    "          <span class='glyphicon glyphicon-minus'></span>\n" +
+    "        </a>\n" +
+    "      </div>\n" +
+    "    </div>\n";
+
