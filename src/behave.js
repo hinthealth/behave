@@ -22,7 +22,7 @@ Behave.domTypes = {
     attrOptions: ['name', 'for', 'placeholder', 'contains', 'type', 'test-me']
   },
   clickable: {
-    elementTypes: ['button', 'a'],
+    elementTypes: ['button', 'a', 'select'],
     attrOptions: ['contains', 'href', 'test-me']
   },
   icon: {
@@ -70,7 +70,7 @@ Behave.find = function(identifier, type, opts) {
   }
   // Fall back to jQuery if we can't find anything
   if (!element.length) {
-    element = tryToFind(identifier);
+    element = Behave.view.find(identifier);
   }
 
   // No element has been found, and we're in error mode.
@@ -133,6 +133,37 @@ Behave.bexpect = function(identifier, opts) {
   }
 
   throw new Error("It appears jasmine or expect isn't defined. Thus Behave can't delegate expect");
+};
+
+Behave.click = function(identifier) {
+  if (identifier instanceof jQuery) {
+    if (identifier.is('input') && identifier.attr('type') === 'radio') {
+      return identifier.click().trigger('click');
+    } else {
+      return identifier.trigger('click');
+    }
+    return;
+  }
+  if (_.isString(identifier)) {
+    return Behave.find(identifier).trigger('click');
+  }
+  throw new Error("The identifier passed to click was invalid. It must be either a string or jQuery object");
+};
+
+Behave.choose = function(value) {
+  // If id is already jQuery, just go with it. Useful if you've set a variable using Behave.find, and then want to
+  // reuse that variable in a fill later on.
+
+  var chooseFrom = function(dropDown) {
+    var $el = dropDown instanceof jQuery ? dropDown : Behave.find(dropDown);
+    return $el.val(value).trigger('change');
+  };
+
+  var chooseObject = {
+    from: chooseFrom
+  };
+
+  return chooseObject;
 };
 
 
@@ -204,4 +235,4 @@ window.fill = Behave.fill;
 window.findAll = Behave.findAll;
 window.tryFind = Behave.tryFind;
 window.bexpect = Behave.bexpect;
-
+window.click = Behave.click;

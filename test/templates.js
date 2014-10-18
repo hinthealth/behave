@@ -125,3 +125,19 @@
     "    </div>\n" +
     "  </div>\n" +
     "</div>";
+
+  templates.dropdowns =
+    "    <div class='row' ng-hide='show.addCoupon'>\n" +
+    "      <div class='col-xs-8'>\n" +
+    "        <select class='form-control' test-me='coupons'>\n" +
+    "          <option value='InactiveCoupon'>Inactive Coupon</option>\n" +
+    "          <option value='ActiveCoupon'>Active Coupon</option>\n" +
+    "        </select>\n" +
+    "      </div>\n" +
+    "      <div class='col-xs-4'>\n" +
+    "        <a class='btn btn-default' href='' ng-click='removeCoupon()'>\n" +
+    "          <span class='glyphicon glyphicon-minus'></span>\n" +
+    "        </a>\n" +
+    "      </div>\n" +
+    "    </div>\n";
+
