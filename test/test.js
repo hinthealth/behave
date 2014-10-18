@@ -191,7 +191,7 @@
     beforeEach(function() {
       Behave.view = $view = $(templates.dropdowns);
     });
-    it.only("should select a dropdown", function() {
+    it("should select a dropdown", function() {
       var coupon = Behave.choose('InactiveCoupon').from('coupons');
       coupon.val().should.eql('InactiveCoupon');
       coupon = Behave.choose('ActiveCoupon').from('coupons');
