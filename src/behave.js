@@ -36,8 +36,6 @@ Behave.domTypes = {
   }
 };
 
-Behave.getAllElsAttrOptions = ['name', 'for', 'placeholder', 'type', 'test-me'];
-
 Behave.find = function(identifier, type, opts) {
   opts = opts || {};
   var element = '';
@@ -124,29 +122,6 @@ Behave.fill = function(identifier) {
   }
 
   return fillObject;
-};
-
-Behave.getAllEls = function(element, $els) {
-  element = element || Behave.view;
-  $els = $els || {};
-  var kids = element.children;
-  if (kids.length) {
-    element.children().each(function() {
-      $els = Behave.getAllEls($(this), $els);
-    });
-  }
-  _.each(Behave.getAllElsAttrOptions, function(attrOption) {
-    var attrVal = cleanVal(element.attr(attrOption));
-    if (attrVal) {
-      element.reload = function() {
-        return Behave.find(attrVal);
-      }
-    }
-    attrVal && ($els[attrVal] = element)
-  });
-  var elText = element.text();
-  if(elText) {$els[cleanVal(elText)] = element;}
-  return $els;
 };
 
 Behave.bexpect = function(identifier, opts) {

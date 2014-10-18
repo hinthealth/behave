@@ -184,30 +184,4 @@
       });
     })
   });
-  describe("#getAllEls", function() {
-    var $els;
-    beforeEach(function() {
-      var form = $("<form type='form'></form>")
-      form.append("<input type='checkbox' name='accept_terms'>")
-      form.append("<input type='text' name='first_name'>")
-      form.append("<label for='practice_url'>Practice Url</label>")
-      form.append("<input type='text' name='practice_url'>")
-      $view.append("<div name='coupon-container'></div>")
-      $view.append(form)
-      $els = Behave.getAllEls();
-    });
-    it("should create an object with jQ elements from the whole page", function() {
-      $els.accept_terms.attr('name').should.eql(Behave.find('accept_terms').attr('name'));
-      $els.first_name.attr('name').should.eql(Behave.find('first_name').attr('name'));
-    });
-    it("should camelCase elements with attrs that are dash-cased", function() {
-      $els.couponContainer.should.be.an.Object
-    });
-    it("should concatenate the text of label elements", function() {
-      $els.PracticeUrl.should.be.an.Object
-    });
-    xit("should give each element a reload method", function() {
-      // Need to test this properly, but it works for our angular testing;
-    });
-  });
 }());
