@@ -52,11 +52,21 @@ if(typeof t!="number"&&null!=t){var o=u;for(t=Y.createCallback(t,e,3);o--&&t(n[o
 Y.prototype[n]=function(){return new nt(t.apply(this.__wrapped__,arguments),this.__chain__)}}),Y}var h,g=[],y=[],m=0,_=+new Date+"",b=75,d=40,w=" \t\x0B\f\xa0\ufeff\n\r\u2028\u2029\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000",j=/\b__p\+='';/g,k=/\b(__p\+=)''\+/g,x=/(__e\(.*?\)|\b__t\))\+'';/g,C=/\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g,O=/\w*$/,I=/^function[ \n\r\t]+\w/,N=/<%=([\s\S]+?)%>/g,E=RegExp("^["+w+"]*0+(?=.$)"),S=/($^)/,R=/\bthis\b/,A=/['\n\r\t\u2028\u2029\\]/g,D="Array Boolean Date Function Math Number Object RegExp String _ attachEvent clearTimeout isFinite isNaN parseInt setImmediate setTimeout".split(" "),B="[object Arguments]",$="[object Array]",F="[object Boolean]",T="[object Date]",W="[object Function]",q="[object Number]",z="[object Object]",P="[object RegExp]",K="[object String]",L={};
 L[W]=!1,L[B]=L[$]=L[F]=L[T]=L[q]=L[z]=L[P]=L[K]=!0;var M={leading:!1,maxWait:0,trailing:!1},U={configurable:!1,enumerable:!1,value:null,writable:!1},V={"boolean":!1,"function":!0,object:!0,number:!1,string:!1,undefined:!1},G={"\\":"\\","'":"'","\n":"n","\r":"r","\t":"t","\u2028":"u2028","\u2029":"u2029"},H=V[typeof window]&&window||this,J=V[typeof exports]&&exports&&!exports.nodeType&&exports,Q=V[typeof module]&&module&&!module.nodeType&&module,X=Q&&Q.exports===J&&J,Y=V[typeof global]&&global;!Y||Y.global!==Y&&Y.window!==Y||(H=Y);
 var Z=v();typeof define=="function"&&typeof define.amd=="object"&&define.amd?(H._=Z, define(function(){return Z})):J&&Q?X?(Q.exports=Z)._=Z:J._=Z:H._=Z}).call(this);
-// Little jQuery extension to have exact equals;
-$.expr[':'].textEquals = function(a, i, m) {
-    var match = $(a).text().match("^" + m[3] + "$")
+'use strict';
+// Little jQuery extension for exact and rough text matching
+$.expr[':'].textEquals = function(el, i, m) {
+    var textToMatch = m[3];
+    var match = $(el).text().trim().match("^" + textToMatch + "$")
     return match && match.length > 0;
-}
+};
+
+// This is similar to contains, except not case sensitive.
+$.expr[':'].textRoughMatch = function(el, i, m) {
+    var textToMatch = m[3];
+    var elText = $(el).text().toLowerCase();
+    var res = elText.toLowerCase().indexOf(textToMatch.toLowerCase()) !== -1;
+    return res;
+};
 
 window.Behave = {};
 Behave.view = $(document.body);
@@ -66,7 +76,7 @@ Behave.domTypes = {
     attrOptions: ['name', 'for', 'placeholder', 'contains', 'type', 'test-me']
   },
   clickable: {
-    elementTypes: ['button', 'a'],
+    elementTypes: ['button', 'a', 'select'],
     attrOptions: ['contains', 'href', 'test-me']
   },
   icon: {
@@ -74,34 +84,32 @@ Behave.domTypes = {
     attrOptions: ['type', 'class', 'test-me']
   },
   display: {
-    elementTypes: [''], // This is actually all elements, since there's no leading el type
+    // The empty string is actually all elements, since there's no leading el type
+    elementTypes: ['table', 'tr', 'td', 'th', ''],
     attrOptions: ['test-me', 'contains']
   }
-}
+};
 
-Behave.getAllElsAttrOptions = ['name', 'for', 'placeholder', 'type', 'test-me']
-
-Behave.find = function(identifier, type) {
+Behave.find = function(identifier, type, opts) {
+  opts = opts || {};
   var element = '';
   var searchOptions = type ? {specificOption: Behave.domTypes[type]} : Behave.domTypes;
   _.each(searchOptions, function(searchParams) {
     _.each(searchParams.elementTypes, function(elType) {
-      if (element.length) {
-        // Explicitly returning false kills iteration early in lodash.
-        return false;
-      }
+      // Explicitly returning false kills iteration early in lodash.
+      if (element.length) {return false;}
+
       _.each(searchParams.attrOptions, function(attrOption) {
         switch (attrOption) {
           case 'contains':
-            var filter = ":textEquals("+ identifier + ")"
-            element = Behave.view.find(elType + filter);
+            element = findByText(identifier, elType);
             break;
           case 'class':
-            element = findByClass(identifier, elType, 'glyphicon-');
+            element = findByClass(identifier, elType);
             break;
           default:
             var filter = "[" + attrOption + "='" + identifier + "']";
-            element = Behave.view.find(elType + filter);
+            element = tryToFind(elType + filter);
         }
         // Explicitly returning false kills iteration early in lodash.
         if (element.length) {
@@ -109,7 +117,7 @@ Behave.find = function(identifier, type) {
         }
       });
     });
-  })
+  });
 
   if (element && element.is('label')) {
     element = getClosestInput(element);
@@ -118,7 +126,26 @@ Behave.find = function(identifier, type) {
   if (!element.length) {
     element = Behave.view.find(identifier);
   }
+
+  // No element has been found, and we're in error mode.
+  if (!element.length && !opts.noErrors) {
+    throw new Error('Can\'t find element identified by ' + identifier);
+  }
+
+  // We found too many things
+  if (element.length > 1 && !opts.findMany) {
+    throw new Error('Matched multiple elements identified by ' + identifier + '. Use findAll if that\'s what you expect.')
+  }
+
   return element;
+};
+
+Behave.tryFind = function(identifier, type) {
+  return Behave.find(identifier, type, {noErrors: true});
+};
+
+Behave.findAll = function(identifier, type) {
+  return Behave.find(identifier, type, {findMany: true});
 };
 
 
@@ -126,6 +153,7 @@ Behave.fill = function(identifier) {
   // If id is already jQuery, just go with it. Useful if you've set a variable using Behave.find, and then want to
   // reuse that variable in a fill later on.
   var $el = identifier instanceof jQuery ? identifier : Behave.find(identifier, 'field');
+
   var fillWith = function(data) {
     if ($el.is('form') || $el.attr('type') === 'form') {
       if (!_.isObject(data)) {
@@ -150,43 +178,94 @@ Behave.fill = function(identifier) {
   return fillObject;
 };
 
-Behave.getAllEls = function(element, $els) {
-  element = element || Behave.view;
-  $els = $els || {};
-  var kids = element.children;
-  if (kids.length) {
-    element.children().each(function() {
-      $els = Behave.getAllEls($(this), $els);
-    });
-  }
-  _.each(Behave.getAllElsAttrOptions, function(attrOption) {
-    var attrVal = cleanVal(element.attr(attrOption));
-    if (attrVal) {
-      element.reload = function() {
-        return Behave.find(attrVal);
-      }
+Behave.bexpect = function(identifier, opts) {
+  if (_.isObject(jasmine)) {
+    if (_.isString(identifier)) {
+      return jasmine.getGlobal().expect(Behave.find(identifier, opts));
     }
-    attrVal && ($els[attrVal] = element)
-  });
-  var elText = element.text();
-  if(elText) {$els[cleanVal(elText)] = element;}
-  return $els;
+    return jasmine.getGlobal().expect(identifier);
+  }
+
+  throw new Error("It appears jasmine or expect isn't defined. Thus Behave can't delegate expect");
+};
+
+Behave.click = function(identifier) {
+  if (identifier instanceof jQuery) {
+    if (identifier.is('input') && identifier.attr('type') === 'radio') {
+      return identifier.click().trigger('click');
+    } else {
+      return identifier.trigger('click');
+    }
+    return;
+  }
+  if (_.isString(identifier)) {
+    return Behave.find(identifier).trigger('click');
+  }
+  throw new Error("The identifier passed to click was invalid. It must be either a string or jQuery object");
+};
+
+Behave.choose = function(value) {
+  // If id is already jQuery, just go with it. Useful if you've set a variable using Behave.find, and then want to
+  // reuse that variable in a fill later on.
+
+  var chooseFrom = function(dropDown) {
+    var $el = dropDown instanceof jQuery ? dropDown : Behave.find(dropDown);
+    return $el.val(value).trigger('change');
+  };
+
+  var chooseObject = {
+    from: chooseFrom
+  };
+
+  return chooseObject;
 };
 
 
 // PRIVATE FUNCTIONS
+var tryToFind = function(expression) {
+  var el = '';
+  try {
+    el = Behave.view.find(expression);
+  }
+  catch (e) {
+    // Syntax errors occur sometimes when trying to do certain operations
+    // with ~'s and such. We just want it to return nothing in this case.
+    if ( !(_.contains(e.message, "Syntax error")) ) {
+      // Re throw if it's not a syntax errors
+      throw (e)
+    }
+  }
+  return $(el);
+};
+
 var getClosestInput = function($el) {
   var sibling = $el.next();
-  if (sibling.is('input')) {return sibling}
+  if (sibling.is('input')) {return sibling;}
   var relatedInput = sibling.find('input');
   return relatedInput.length ? relatedInput : $el;
 };
 
-var findByClass = function(identifier, elType, prefix) {
-  prefix = prefix || '';
+var findByClass = function(identifier, elType) {
+  var prefix = _.contains(['icon', 'div', 'span'], elType) ? 'glyphicon-' : '';
   elType = elType || '';
-  return Behave.view.find(elType + '.' + prefix + identifier).first();
-}
+  var expression = elType + '.' + prefix + identifier;
+
+  return tryToFind(expression).first();
+};
+
+var findByText = function(identifier, elType) {
+  var filterMethod, filterString, expression;
+  filterMethod = ":textEquals";
+
+  if (identifier[0] === '~') {
+    identifier = identifier.slice(1);
+    filterMethod = ":textRoughMatch";
+  }
+  filterString = filterMethod + "('" + identifier + "')";
+  expression = elType + filterString;
+
+  return tryToFind(expression);
+};
 
 var cleanVal = function(val) {
   if (!val) {return;}
@@ -194,7 +273,7 @@ var cleanVal = function(val) {
   // Remove any spaces.
   val = val.replace(' ', '');
 
-  if (val.indexOf('-') !== -1) {
+  if (_.contains(val, '-')) {
     // camelCasing attrs with dashes in them.
     var words = val.split('-');
     words[1] = words[1][0].toUpperCase() + words[1].substring(1);
@@ -206,5 +285,8 @@ var cleanVal = function(val) {
 
 // Set functions to the window for convenience
 window.find = Behave.find;
-window.fill = Behave.fill
-
+window.fill = Behave.fill;
+window.findAll = Behave.findAll;
+window.tryFind = Behave.tryFind;
+window.bexpect = Behave.bexpect;
+window.click = Behave.click;
