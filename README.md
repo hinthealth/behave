@@ -53,13 +53,16 @@ Behave.find('Birthday', 'display') // Searches EXACT text of all elements.
 ```
 
 **#tryFind**
+
 For those times when you don't want find to error (like checking that an element doesn't exist), you can use tryFind
 `tryFind(identifier, [type])`
 
 **#findAll**
+
 findAll will allow you to find multiple elements (where as `find` errors unless it finds exactly 1)
 
 **#fill**
+
   `fill('identifier').with('some value').`
   `fill` by itself really does nothing. it returns an object that has a "with" method where you fill the value.
   It also has a special case of taking a form, and you can pass it an object with many values, like so...
@@ -74,6 +77,7 @@ findAll will allow you to find multiple elements (where as `find` errors unless 
   ```
 
 **#click**
+
 `click(identifier)` // basically does find('identifier').trigger('click')
 click can take a string or a jquery object. 
 ex. `click('Create')`. Or `var button = find('Create') ; click(button)`
@@ -81,10 +85,12 @@ click also handles angular idiosyncracies like a radio element needing to do '.c
 
 
 **#select**
+
 `select('value').from('dropdownIdentifier')`
 Basically like click, except with dropdowns.
 
 **Global Methods**
+
 For convenience (and because it should only get loaded during tests), Behave aliases the following
 methods to the window. So in your tests you can just do...
 ```
