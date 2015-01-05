@@ -84,9 +84,9 @@ ex. `click('Create')`. Or `var button = find('Create') ; click(button)`
 click also handles angular idiosyncracies like a radio element needing to do '.click().trigger('click')'
 
 
-**#select**
+**#choose**
 
-`select('value').from('dropdownIdentifier')`
+`choose('value').from('dropdownIdentifier')`
 Basically like click, except with dropdowns.
 
 **Global Methods**
