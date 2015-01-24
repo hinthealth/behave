@@ -236,3 +236,4 @@ window.findAll = Behave.findAll;
 window.tryFind = Behave.tryFind;
 window.bexpect = Behave.bexpect;
 window.click = Behave.click;
+window.choose = Behave.choose;
