@@ -4,16 +4,18 @@ We put the DOM back in the DOM.
 
 `bower install behave`
 
+include the behave, lodash and jquery scripts in your test framework
+
 **USE IT LIKE THIS**
 
 Tired of doing lame, verbose jQuery to grab and manipulate elements in your front-end tests? No more!
 
-Before: 
+Before:
   ```
    $("[name='email']").val('joeShmo@gmail.com').trigger('input');
    $("[for='age']").val(27).trigger('input');
    $("[for='dob']").val('04/27/87').trigger('input');
-   
+
    var createButton = $view.find("button:contains('Create')")
    expect(createButton).not.toBeDisabled();
   ```
@@ -26,7 +28,7 @@ Now with Behave!:
 
 
 
-Behave! tries to intelligently find things when you try to fill in an element on the page. If your 
+Behave! tries to intelligently find things when you try to fill in an element on the page. If your
 forms conform to general standards, it will likely find them. It searches for attrs like
 name, for, placeholder, type, actual text, and others. Fill only looks through element types
 that would typically show up in a form ('input', 'select', 'option', 'label', 'textarea', or 'form').
@@ -43,7 +45,7 @@ It will error if it doesn't find exactly one element. That means it fails if it 
 
 Why would you want to do this? Sometimes having a variable is nice.
 
-Type is optional. Thus, try to give it something unique, but if your searching for something that's not, 
+Type is optional. Thus, try to give it something unique, but if your searching for something that's not,
 you can specify a "type" of DOM element to narrow the search by doing...
 ```
 Behave.find('email', 'field') // Finds els of type 'input', 'select', 'option', 'label', 'textarea', or 'form'
@@ -67,9 +69,9 @@ findAll will allow you to find multiple elements (where as `find` errors unless 
   `fill` by itself really does nothing. it returns an object that has a "with" method where you fill the value.
   It also has a special case of taking a form, and you can pass it an object with many values, like so...
   ```
-   fill('form').with({first_name: "Phil", last_name: "Lesh", age: 58}); 
+   fill('form').with({first_name: "Phil", last_name: "Lesh", age: 58});
   ```
-  
+
   Lastly, it's good to know that `fill` can also take a jQuery object, which is convenient when you want to use a variable to store an element, like so...
   ```
    var myEl = Behave.find('myEl')
@@ -79,7 +81,7 @@ findAll will allow you to find multiple elements (where as `find` errors unless 
 **#click**
 
 `click(identifier)` // basically does find('identifier').trigger('click')
-click can take a string or a jquery object. 
+click can take a string or a jquery object.
 ex. `click('Create')`. Or `var button = find('Create') ; click(button)`
 click also handles angular idiosyncracies like a radio element needing to do '.click().trigger('click')'
 
