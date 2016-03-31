@@ -1,16 +1,13 @@
 ***BEHAVE!***
-Dominate the DOM.
-We put the DOM back in the DOM.
+We put the Dom back in the DOM.
 
 `bower install behave`
 
-include the behave, lodash and jquery scripts in your test framework
+include behave, lodash and jquery scripts in your test framework
 
-**USE IT LIKE THIS**
+**The Problem This Solves**
+As we wrote front-end tests, we kept having to write verbose jQuery in order to grab and manipulate elements in our front-end tests. It sucked. Maybe you do the same thing. Maybe it looks like this...
 
-Tired of doing lame, verbose jQuery to grab and manipulate elements in your front-end tests? No more!
-
-Before:
   ```
    $("[name='email']").val('joeShmo@gmail.com').trigger('input');
    $("[for='age']").val(27).trigger('input');
@@ -19,18 +16,17 @@ Before:
    var createButton = $view.find("button:contains('Create')")
    expect(createButton).not.toBeDisabled();
   ```
+  Ew. Gross.
 
-Now with Behave!:
+**The Solution**
+Behave! Tell that DOM exactly what you want.
   ```
   fill('form').with({email: 'joeShmo@gmail.com', age: 27, dob: '04/27/87'});
   expect(find('Create')).not.toBeDisabled()
   ```
 
-
-
-Behave! tries to intelligently find things when you try to fill in an element on the page. If your
-forms conform to general standards, it will likely find them. It searches for attrs like
-name, for, placeholder, type, actual text, and others. Fill only looks through element types
+The example above uses Behave's `fill` method. It tries to intelligently find elements that you need on the page. If your forms conform to general standards, it will likely find them. It searches for attrs like
+`name`, `for`, `placeholder`, `type`, plus actual text, and others. Fill only looks through element types
 that would typically show up in a form ('input', 'select', 'option', 'label', 'textarea', or 'form').
 
 
