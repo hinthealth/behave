@@ -1,8 +1,8 @@
 'use strict';
 // Little jQuery extension for exact and rough text matching
 $.expr[':'].textEquals = function(el, i, m) {
-    var textToMatch = m[3];
-    var match = $(el).text().trim().match("^" + textToMatch + "$")
+    var textToMatch = ("^" + m[3] + "$").replace("[", "\\[").replace("]", "\\]");
+    var match = $(el).text().trim().match(textToMatch);
     return match && match.length > 0;
 };
 
@@ -176,7 +176,7 @@ var tryToFind = function(expression) {
   catch (e) {
     // Syntax errors occur sometimes when trying to do certain operations
     // with ~'s and such. We just want it to return nothing in this case.
-    if ( !(_.contains(e.message, "Syntax error")) ) {
+    if ( !(_.contains(e.message, "Syntax error") || _.contains(e.message, "SyntaxError")) ) {
       // Re throw if it's not a syntax errors
       throw (e)
     }
