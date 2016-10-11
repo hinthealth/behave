@@ -1,8 +1,8 @@
 'use strict';
 // Little jQuery extension for exact and rough text matching
 $.expr[':'].textEquals = function(el, i, m) {
-    var textToMatch = ("^" + m[3] + "$").replace("[", "\\[").replace("]", "\\]");
-    var match = $(el).text().trim().match(textToMatch);
+    var reToMatch = new RegExp(("^" + m[3].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + "$"));
+    var match = $(el).text().trim().match(reToMatch);
     return match && match.length > 0;
 };
 
