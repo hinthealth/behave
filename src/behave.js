@@ -176,7 +176,7 @@ var tryToFind = function(expression) {
   catch (e) {
     // Syntax errors occur sometimes when trying to do certain operations
     // with ~'s and such. We just want it to return nothing in this case.
-    if ( !(_.contains(e.message, "Syntax error")) ) {
+    if ( !(_.contains(e.message, "Syntax error") || _.contains(e.message, "SyntaxError")) ) {
       // Re throw if it's not a syntax errors
       throw (e)
     }
