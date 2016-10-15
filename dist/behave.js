@@ -176,7 +176,7 @@ var tryToFind = function(expression) {
   catch (e) {
     // Syntax errors occur sometimes when trying to do certain operations
     // with ~'s and such. We just want it to return nothing in this case.
-    if ( !(_.contains(e.message, "Syntax error") || _.contains(e.message, "SyntaxError")) ) {
+    if ( !(_.includes(e.message, "Syntax error") || _.includes(e.message, "SyntaxError")) ) {
       // Re throw if it's not a syntax errors
       throw (e)
     }
@@ -192,7 +192,7 @@ var getClosestInput = function($el) {
 };
 
 var findByClass = function(identifier, elType) {
-  var prefix = _.contains(['icon', 'div', 'span'], elType) ? 'glyphicon-' : '';
+  var prefix = _.includes(['icon', 'div', 'span'], elType) ? 'glyphicon-' : '';
   elType = elType || '';
   var expression = elType + '.' + prefix + identifier;
 
@@ -219,7 +219,7 @@ var cleanVal = function(val) {
   // Remove any spaces.
   val = val.replace(' ', '');
 
-  if (_.contains(val, '-')) {
+  if (_.includes(val, '-')) {
     // camelCasing attrs with dashes in them.
     var words = val.split('-');
     words[1] = words[1][0].toUpperCase() + words[1].substring(1);
