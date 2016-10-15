@@ -80,14 +80,14 @@
           var jqResult = $view.find("a:contains('Back to All Invoices')");
           var bResultNotExact = Behave.tryFind("Back to All");
           var bResultExact = Behave.find("Back to All Invoices");
-          bResultExact.text().should == "Back to All Invoices";
+          bResultExact.text().should.containEql("Back to All Invoices");
           bResultExact.text().should.eql(jqResult.text());
           bResultNotExact.text().should.eql('');
         });
       });
       describe("when using rough match", function() {
         beforeEach(function() {
-          Behave.view.append("<div>Success: This is alert text that could be many things!</div>")
+          Behave.view.append("<div>Success: This is alert text that could be many things!</div>");
         });
         it("should find a substring match", function() {
           var bResult = Behave.find('~Success');
@@ -105,7 +105,7 @@
         $view.append("<button>Subdomain</button>");
         $view.append("<a href='www.test.com'>Practice Url</button>");
         jqResult = $view.find('button:contains(Subdomain)');
-      })
+      });
       it("should find only clickable type elements and search by containing text", function() {
         bResult = Behave.find('Subdomain', 'clickable');
         bResult.is('input').should.eql(false);
@@ -125,8 +125,8 @@
     });
     describe("with icon type elements", function() {
       beforeEach(function() {
-        $view.append("<span class='glyphicon glyphicon-cancel'></span>")
-        $view.append("<icon type='danger'></icon>")
+        $view.append("<span class='glyphicon glyphicon-cancel'></span>");
+        $view.append("<icon type='danger'></icon>");
       });
       it("find icons by type", function() {
         Behave.find('danger', 'icon').attr('type').should.eql('danger');
@@ -137,8 +137,8 @@
     });
     describe("when passing jQuery type selectors", function() {
       beforeEach(function() {
-        $view.append("<div id='someId'>Worked!</div>")
-        $view.append("<div class='someclass'>Worked!</div>")
+        $view.append("<div id='someId'>Worked!</div>");
+        $view.append("<div class='someclass'>Worked!</div>");
       });
       it("should use jQuery if it can't find it normally", function() {
         Behave.find('#someId').text().should.eql('Worked!');
@@ -152,18 +152,18 @@
     });
     describe("using #with", function() {
       beforeEach(function() {
-        var form = $("<form type='form'></form>")
-        form.append("<input type='checkbox' name='accept_terms'>")
-        form.append("<input type='text' name='first_name'>")
-        form.append("<label for='practice_url'>Practice Url</label>")
-        form.append("<input type='text' name='practice_url'>")
-        $view.append(form)
+        var form = $("<form type='form'></form>");
+        form.append("<input type='checkbox' name='accept_terms'>");
+        form.append("<input type='text' name='first_name'>");
+        form.append("<label for='practice_url'>Practice Url</label>");
+        form.append("<input type='text' name='practice_url'>");
+        $view.append(form);
       });
       describe('on individual form elements', function() {
         it("should fill in the element with the provided data", function() {
           Behave.fill('testPlaceholder').with('bananas');
           Behave.find('testPlaceholder').val().should.eql('bananas');
-        })
+        });
         it("should work with checkboxes", function() {
           Behave.find('accept_terms').prop('checked').should.be.false
           Behave.fill('accept_terms').with(true);
@@ -178,11 +178,11 @@
             'Practice Url': 'www.yesthisworked.com'
           });
           Behave.find('accept_terms').prop('checked').should.be.true
-          Behave.find('first_name').val().should.eql('Joe Shmo')
-          Behave.find('Practice Url').val().should.eql('www.yesthisworked.com')
-        })
+          Behave.find('first_name').val().should.eql('Joe Shmo');
+          Behave.find('Practice Url').val().should.eql('www.yesthisworked.com');
+        });
       });
-    })
+    });
   });
   xdescribe("#click", function() {
     it("would be annoying to test, but I manually tested this");
