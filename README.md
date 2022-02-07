@@ -1,5 +1,5 @@
 ***BEHAVE!***
-We put the Dom back in the DOM.
+To install
 
 `bower install behave`
 
@@ -19,7 +19,7 @@ As we wrote front-end tests, we kept having to write verbose jQuery in order to 
   Ew. Gross.
 
 **The Solution**
-Behave! Tell that DOM exactly what you want.
+Behave! Tell the DOM exactly what you want.
   ```
   fill('form').with({email: 'joeShmo@gmail.com', age: 27, dob: '04/27/87'});
   expect(find('Create')).not.toBeDisabled()
